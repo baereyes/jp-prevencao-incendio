@@ -314,8 +314,8 @@
      Empurra o evento "whatsapp_click" para o dataLayer. As tags (conversão do Google Ads e evento do GA4)
      ficam no GTM-T44GQM7Q, não aqui, para não contar em dobro. */
   document.addEventListener("click", function (ev) {
-    var a = ev.target && ev.target.closest ? ev.target.closest('a[href*="wa.me"], a[href*="api.whatsapp.com"]') : null;
-    if (!a) return;
+    var a = ev.target && ev.target.closest ? ev.target.closest("a[href]") : null;
+    if (!a || !/^(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)$/i.test(a.hostname)) return;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event: "whatsapp_click", link_url: a.href, link_text: (a.textContent || "").trim().slice(0, 80) });
   });
