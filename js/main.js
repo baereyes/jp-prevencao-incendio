@@ -299,12 +299,29 @@
       var choice = ev.target && ev.target.getAttribute("data-consent");
       if (!choice) return;
       try { window.localStorage.setItem(STORAGE_KEY, choice); } catch (e) {}
+      if (typeof window.gtag === "function") {
+        var g = choice === "accepted" ? "granted" : "denied";
+        window.gtag("consent", "update", { ad_storage: g, ad_user_data: g, ad_personalization: g, analytics_storage: g });
+      }
       cookie.classList.remove("is-visible");
       window.setTimeout(function () { cookie.setAttribute("hidden", ""); }, 450);
     });
   } else if (cookie) {
     cookie.setAttribute("hidden", "");
   }
+
+  /* ---------- Medição: clique em qualquer link de WhatsApp ----------
+     Empurra o evento "whatsapp_click" para o dataLayer (GTM) e dispara a conversão do Google Ads.
+     Os links abrem em nova aba, então o clique não é atrasado. */
+  document.addEventListener("click", function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href*="wa.me"], a[href*="api.whatsapp.com"]') : null;
+    if (!a) return;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: "whatsapp_click", link_url: a.href, link_text: (a.textContent || "").trim().slice(0, 80) });
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "conversion", { send_to: "AW-17949540388/iKgdCIPw-ZsdEKSAge9C" });
+    }
+  });
 
   /* ---------- Ano no rodapé ---------- */
   var y = document.querySelector("[data-year]");
